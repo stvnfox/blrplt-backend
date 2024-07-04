@@ -1,5 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -7,25 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  admin
-  user
-}
-
 model Profile {
-  id String @id @db.Uuid
-  role Role @default(user)
-  site Site[] 
+  id   String @id @db.Uuid
+  role Role   @default(user)
+  site Site[]
 
   @@map("profile")
 }
 
 model Site {
-  id String @id @default(uuid()) @db.Uuid
-  name String
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id     String  @id @default(uuid()) @db.Uuid
+  name   String
   userId String  @db.Uuid
-  
+  pages  Json[]
+  url    String
+  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("site")
+}
+
+enum Role {
+  admin
+  user
 }

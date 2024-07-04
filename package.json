@@ -29,10 +29,10 @@
     "postgres": "^3.4.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "tsx": "^4.16.1"
+    "tsx": "^4.16.2"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.4.0",
+    "@nestjs/cli": "^10.4.1",
     "@nestjs/schematics": "^10.1.2",
     "@nestjs/swagger": "^7.4.0",
     "@nestjs/testing": "^10.3.10",
