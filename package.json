@@ -32,7 +32,7 @@
     "tsx": "^4.16.2"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.4.1",
+    "@nestjs/cli": "^10.4.2",
     "@nestjs/schematics": "^10.1.2",
     "@nestjs/swagger": "^7.4.0",
     "@nestjs/testing": "^10.3.10",
