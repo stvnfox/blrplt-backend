@@ -5,6 +5,7 @@ import { CreateAuthDto } from "./dto/create-auth.dto"
 import { ApiBody, ApiTags } from "@nestjs/swagger"
 import { JwtAuthGuard } from "./guards/jwt.guard"
 import { Request } from "express"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
 
 @Controller("auth")
 @ApiTags("auth")
@@ -39,6 +40,16 @@ export class AuthController {
     async logout() {
         try {
             return this.authService.logout()
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
+
+    // auth/reset-password
+    @Post("reset-password")
+    async resetPassword(@Body() data: ResetPasswordDto) {
+        try {
+            return this.authService.resetPassword(data)
         } catch (error) {
             this.logger.error(error)
         }

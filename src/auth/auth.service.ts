@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common"
-import { CreateAuthDto } from "./dto/create-auth.dto"
-// import { UpdateAuthDto } from './dto/update-auth.dto';
-import { createClient, SupabaseClient } from "@supabase/supabase-js"
-import { hashPassword } from "../../lib/passwords"
 import { JwtService } from "@nestjs/jwt"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
+
+import { CreateAuthDto } from "./dto/create-auth.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
+
+import { hashPassword } from "../../lib/passwords"
 
 @Injectable()
 export class AuthService {
@@ -118,6 +120,28 @@ export class AuthService {
         }
 
         this.logger.log(`User logged out successfully`)
+    }
+
+    async resetPassword(ResetPasswordDto: ResetPasswordDto) {
+      const { error } = await this.supabaseClient.auth.resetPasswordForEmail(ResetPasswordDto.email, {
+        redirectTo: `${process.env.BASE_REDIRECT_URL}/update-password`,
+      })
+
+      if (error) {
+        this.logger.error(error)
+        throw new HttpException(
+          {
+            status: error.status,
+            message: error.message,
+          },
+          HttpStatus.BAD_REQUEST,
+          {
+            cause: error,
+          }
+        )
+      }
+
+      return { message: "succeeded" }
     }
 
     // create(createAuthDto: CreateAuthDto) {
