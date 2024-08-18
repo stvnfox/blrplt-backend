@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common"
 import { CreateAuthDto } from "./dto/create-auth.dto"
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
-import { hashPassword } from "lib/passwords"
+import { hashPassword } from "../../lib/passwords"
 
 @Injectable()
 export class AuthService {
