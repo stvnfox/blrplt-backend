@@ -15,7 +15,8 @@ export class AuthService {
 
     async register(createAuthDto: CreateAuthDto) {
         // check if user already exists and throw an error if they do
-        const { data: { users } } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        const { data: dataResponse } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        const users = dataResponse.users || []
         if(users.find(user => user.email === createAuthDto.email)) {
             throw new HttpException(
                 {
