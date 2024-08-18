@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Logger } from "@nestjs/common"
+import { Controller, Post, Body, Logger, Get, Req, UseGuards } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import { CreateAuthDto } from "./dto/create-auth.dto"
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiBody, ApiTags } from "@nestjs/swagger"
+import { JwtAuthGuard } from "./guards/jwt.guard"
+import { Request } from "express"
 
 @Controller("auth")
 @ApiTags("auth")
@@ -19,6 +21,24 @@ export class AuthController {
         } catch (error) {
             this.logger.error(error)
         }
+    }
+
+    // auth/login
+    @Post("login")
+    @ApiBody({ type: CreateAuthDto, description: "Login a user" })
+    async login(@Body() data: CreateAuthDto) {
+        try {
+            return this.authService.login(data)
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
+
+    // auth/status
+    @Get('status')
+    @UseGuards(JwtAuthGuard)
+    async status(@Req() req: Request) {
+        return req.user
     }
 
     // @Get()

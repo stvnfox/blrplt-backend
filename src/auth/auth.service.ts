@@ -3,20 +3,40 @@ import { CreateAuthDto } from "./dto/create-auth.dto"
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { hashPassword } from "../../lib/passwords"
+import { JwtService } from "@nestjs/jwt"
 
 @Injectable()
 export class AuthService {
     private logger = new Logger(AuthService.name)
     private supabaseClient: SupabaseClient
 
-    constructor() {
+    constructor(private jwtService: JwtService) {
         this.supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ADMIN)
+    }
+
+    async getUsers() {
+        const { data, error } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        if (error) {
+          this.logger.error(error)
+          throw new HttpException(
+            {
+              status: error.status,
+              message: error.message,
+            },
+            HttpStatus.BAD_REQUEST,
+            {
+              cause: error,
+            }
+          )
+        }
+        
+        const users = data.users || []
+        return users
     }
 
     async register(createAuthDto: CreateAuthDto) {
         // check if user already exists and throw an error if they do
-        const { data: dataResponse } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
-        const users = dataResponse.users || []
+        const users = await this.getUsers()
         if(users.find(user => user.email === createAuthDto.email)) {
             throw new HttpException(
                 {
@@ -50,6 +70,34 @@ export class AuthService {
 
         this.logger.log(`User registered successfully with email: ${createAuthDto.email}`)
         return data
+    }
+
+    async login(loginAuthDto: CreateAuthDto) {
+        const { data, error } = await this.supabaseClient.auth.signInWithPassword({
+            email: loginAuthDto.email,
+            password: loginAuthDto.password,
+        })
+
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: error,
+                }
+            )
+        }
+        
+        // log the successful login for email
+        this.logger.log(`User logged in successfully with email: ${loginAuthDto.email}`)
+        
+        // sign the access token and return it
+        this.jwtService.sign(data.session.access_token)
+        return data.session.access_token
     }
 
     // create(createAuthDto: CreateAuthDto) {
