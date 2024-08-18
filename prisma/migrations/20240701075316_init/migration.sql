@@ -14,6 +14,7 @@ CREATE TABLE "site" (
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "userId" UUID NOT NULL,
+    "pages" JSONB[],
 
     CONSTRAINT "site_pkey" PRIMARY KEY ("id")
 );
