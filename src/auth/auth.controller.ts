@@ -34,8 +34,18 @@ export class AuthController {
         }
     }
 
+    // auth/logout
+    @Post("logout")
+    async logout() {
+        try {
+            return this.authService.logout()
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
+
     // auth/status
-    @Get('status')
+    @Get("status")
     @UseGuards(JwtAuthGuard)
     async status(@Req() req: Request) {
         return req.user

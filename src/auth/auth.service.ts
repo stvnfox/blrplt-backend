@@ -100,6 +100,26 @@ export class AuthService {
         return data.session.access_token
     }
 
+    async logout() {
+        const { error } = await this.supabaseClient.auth.signOut()
+
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: error,
+                }
+            )
+        }
+
+        this.logger.log(`User logged out successfully`)
+    }
+
     // create(createAuthDto: CreateAuthDto) {
     //   return 'This action adds a new auth';
     // }
