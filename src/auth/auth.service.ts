@@ -94,7 +94,7 @@ export class AuthService {
         }
 
         // log the successful login for email
-        this.logger.log(`User logged in successfully with email: ${loginAuthDto.email}`)
+        this.logger.log(`user logged in successfully with email: ${loginAuthDto.email}`)
 
         return data.session
     }
@@ -120,6 +120,20 @@ export class AuthService {
     }
 
     async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const users = await this.getUsers()
+        const userExists = users.find((user) => user.email === resetPasswordDto.email)
+        
+        if (!userExists) {
+            this.logger.error(`user with email ${resetPasswordDto.email} doesn't exists`)
+            throw new HttpException(
+                {
+                    status: HttpStatus.CONFLICT,
+                    message: `user with email ${resetPasswordDto.email} doesn't exists`,
+                },
+                HttpStatus.CONFLICT
+            )
+        }
+        
         const { error } = await this.supabaseClient.auth.resetPasswordForEmail(resetPasswordDto.email, {
             redirectTo: `${process.env.BASE_REDIRECT_URL}/update-password`,
         })
@@ -139,7 +153,7 @@ export class AuthService {
         }
 
         this.logger.log(`Password reset email sent to ${resetPasswordDto.email}`)
-        return { message: "succeeded" }
+        return { status: 201, message: "succeeded" }
     }
 
     async updatePassword(updatePasswordDto: UpdatePasswordDto) {
