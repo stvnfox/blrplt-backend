@@ -7,8 +7,6 @@ import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { ResetPasswordDto } from "./dto/reset-password.dto"
 import { ConfirmDto } from "./dto/confirm.dto"
 
-import { hashPassword } from "../../lib/passwords"
-
 @Injectable()
 export class AuthService {
     private logger = new Logger(AuthService.name)
@@ -52,10 +50,9 @@ export class AuthService {
         }
 
         // create a new user
-        const password = await hashPassword(createAuthDto.password)
         const { data, error } = await this.supabaseClient.auth.signUp({
             email: createAuthDto.email,
-            password: password,
+            password: createAuthDto.password,
         })
 
         if (error) {
@@ -89,7 +86,7 @@ export class AuthService {
                     status: error.status,
                     message: error.message,
                 },
-                HttpStatus.BAD_REQUEST,
+                error.status,
                 {
                     cause: error,
                 }
@@ -99,9 +96,7 @@ export class AuthService {
         // log the successful login for email
         this.logger.log(`User logged in successfully with email: ${loginAuthDto.email}`)
 
-        // sign the access token and return it
-        this.jwtService.sign(data.session.access_token)
-        return data.session.access_token
+        return data.session
     }
 
     async logout() {
