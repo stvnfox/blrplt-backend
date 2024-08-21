@@ -5,6 +5,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import { CreateAuthDto } from "./dto/create-auth.dto"
 import { UpdatePasswordDto } from "./dto/update-password.dto"
 import { ResetPasswordDto } from "./dto/reset-password.dto"
+import { ConfirmDto } from "./dto/confirm.dto"
 
 import { hashPassword } from "../../lib/passwords"
 
@@ -181,5 +182,20 @@ export class AuthService {
 
         this.logger.log(`Password updated successfully`)
         return { message: "your password is succesfully changed!" }
+    }
+
+    async confirm(confirmDto: ConfirmDto) {
+        if(!confirmDto.token) {
+            this.logger.error("token is required")
+            throw new HttpException(
+                {
+                    status: HttpStatus.BAD_REQUEST,
+                    message: "token is required",
+                },
+                HttpStatus.BAD_REQUEST
+            )
+        }
+
+        return { token: confirmDto.token, redirect_url: confirmDto.redirect_url }
     }
 }
