@@ -17,7 +17,19 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup("docs", app, document)
     //corsOptions
-    app.enableCors()
+    app.enableCors({
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:3210",
+            "https://blrplt-builder.vercel.app",
+            "https://blrplt-builder-staging.vercel.app",
+            "https://blrplt-backend.vercel.app",
+            "https://blrplt-backend-staging.vercel.app",
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+        optionsSuccessStatus: corsOptions.optionsSuccessStatus,
+    })
     await app.listen(3210)
 }
 bootstrap()
