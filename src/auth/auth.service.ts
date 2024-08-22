@@ -157,6 +157,24 @@ export class AuthService {
     }
 
     async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+        const { data, error: sessionError } = await this.supabaseClient.auth.setSession({ access_token: updatePasswordDto.access_token, refresh_token: updatePasswordDto.refresh_token })
+        
+        if(sessionError) {
+            this.logger.error(`sessionError: ${sessionError}`)
+            throw new HttpException(
+                {
+                    status: HttpStatus.BAD_REQUEST,
+                    message: "something went wrong",
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: sessionError,
+                }
+            )
+        }
+
+        this.logger.log(data)
+
         const { error } = await this.supabaseClient.auth.updateUser({
             password: updatePasswordDto.password,
         })
@@ -190,7 +208,7 @@ export class AuthService {
         }
 
         this.logger.log(`Password updated successfully`)
-        return { message: "your password is succesfully changed!" }
+        return { status: 201, message: "your password is succesfully changed!" }
     }
 
     async confirm(confirmDto: ConfirmDto) {
