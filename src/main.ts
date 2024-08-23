@@ -18,8 +18,7 @@ async function bootstrap() {
     SwaggerModule.setup("docs", app, document)
 
     app.use(function (req, res, next) {
-        req.headers.origin = req.headers.origin || req.headers.host;
-        console.log('req.headers.origin: ', req.headers.origin)
+        console.log(req)
         next();
     });
 
