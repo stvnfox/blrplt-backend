@@ -2,10 +2,9 @@ const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:3210",
     "https://blrplt-builder.vercel.app",
-    "https://blrplt-builder-staging.vercel.app",
+    // "https://blrplt-builder-staging.vercel.app",
     "https://blrplt-backend.vercel.app",
     "https://blrplt-backend-staging.vercel.app",
-    "https://blrplt-backend-staging-f7llmwvgz-stvns-projects.vercel.app"
 ]
 
 export const corsOptions = {
