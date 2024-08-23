@@ -4,7 +4,7 @@ import { AppModule } from "./app.module"
 import { corsOptions } from "../lib/cors"
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule)
+    const app = await NestFactory.create(AppModule, { cors: true })
 
     // swagger setup
     const config = new DocumentBuilder()
@@ -17,27 +17,8 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup("docs", app, document)
 
-    app.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-        next();
-    });
-    
     //corsOptions
-    app.enableCors({
-        origin: [
-            "http://localhost:3000",
-            "http://localhost:3210",
-            "https://blrplt-builder.vercel.app",
-            "https://blrplt-builder-staging.vercel.app",
-            "https://blrplt-backend.vercel.app",
-            "https://blrplt-backend-staging.vercel.app",
-        ],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-        optionsSuccessStatus: corsOptions.optionsSuccessStatus,
-    })
+    app.enableCors(corsOptions)
     await app.listen(3210)
 }
 bootstrap()
