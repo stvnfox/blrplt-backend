@@ -117,6 +117,7 @@ export class AuthService {
         }
 
         this.logger.log(`User logged out successfully`)
+        return { status: 201, message: "user logged out successfully" }
     }
 
     async resetPassword(resetPasswordDto: ResetPasswordDto) {
