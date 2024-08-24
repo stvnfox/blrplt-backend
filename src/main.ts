@@ -4,7 +4,7 @@ import { AppModule } from "./app.module"
 import { corsOptions } from "../lib/cors"
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule)
+    const app = await NestFactory.create(AppModule, { cors: true })
 
     // swagger setup
     const config = new DocumentBuilder()
@@ -17,6 +17,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup("docs", app, document)
 
+    //corsOptions
     app.enableCors(corsOptions)
     await app.listen(3210)
 }

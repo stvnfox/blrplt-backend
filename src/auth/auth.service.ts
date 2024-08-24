@@ -1,23 +1,45 @@
 import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common"
-import { CreateAuthDto } from "./dto/create-auth.dto"
-// import { UpdateAuthDto } from './dto/update-auth.dto';
+import { JwtService } from "@nestjs/jwt"
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
-import { hashPassword } from "../../lib/passwords"
+
+import { CreateAuthDto } from "./dto/create-auth.dto"
+import { UpdatePasswordDto } from "./dto/update-password.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
+import { ConfirmDto } from "./dto/confirm.dto"
 
 @Injectable()
 export class AuthService {
     private logger = new Logger(AuthService.name)
     private supabaseClient: SupabaseClient
 
-    constructor() {
+    constructor(private jwtService: JwtService) {
         this.supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ADMIN)
+    }
+
+    async getUsers() {
+        const { data, error } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: error,
+                }
+            )
+        }
+
+        const users = data.users || []
+        return users
     }
 
     async register(createAuthDto: CreateAuthDto) {
         // check if user already exists and throw an error if they do
-        const { data: dataResponse } = await this.supabaseClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
-        const users = dataResponse.users || []
-        if(users.find(user => user.email === createAuthDto.email)) {
+        const users = await this.getUsers()
+        if (users.find((user) => user.email === createAuthDto.email)) {
             throw new HttpException(
                 {
                     status: HttpStatus.CONFLICT,
@@ -28,10 +50,9 @@ export class AuthService {
         }
 
         // create a new user
-        const password = await hashPassword(createAuthDto.password)
         const { data, error } = await this.supabaseClient.auth.signUp({
             email: createAuthDto.email,
-            password: password,
+            password: createAuthDto.password,
         })
 
         if (error) {
@@ -52,23 +73,157 @@ export class AuthService {
         return data
     }
 
-    // create(createAuthDto: CreateAuthDto) {
-    //   return 'This action adds a new auth';
-    // }
+    async login(loginAuthDto: CreateAuthDto) {
+        const { data, error } = await this.supabaseClient.auth.signInWithPassword({
+            email: loginAuthDto.email,
+            password: loginAuthDto.password,
+        })
 
-    // findAll() {
-    //   return `This action returns all auth`;
-    // }
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                error.status,
+                {
+                    cause: error,
+                }
+            )
+        }
 
-    // findOne(id: number) {
-    //   return `This action returns a #${id} auth`;
-    // }
+        // log the successful login for email
+        this.logger.log(`user logged in successfully with email: ${loginAuthDto.email}`)
 
-    // update(id: number, updateAuthDto: UpdateAuthDto) {
-    //   return `This action updates a #${id} auth`;
-    // }
+        return data.session
+    }
 
-    // remove(id: number) {
-    //   return `This action removes a #${id} auth`;
-    // }
+    async logout() {
+        const { error } = await this.supabaseClient.auth.signOut()
+
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: error,
+                }
+            )
+        }
+
+        this.logger.log(`User logged out successfully`)
+        return { status: 201, message: "user logged out successfully" }
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const users = await this.getUsers()
+        const userExists = users.find((user) => user.email === resetPasswordDto.email)
+        
+        if (!userExists) {
+            this.logger.error(`user with email ${resetPasswordDto.email} doesn't exists`)
+            throw new HttpException(
+                {
+                    status: HttpStatus.CONFLICT,
+                    message: `user with email ${resetPasswordDto.email} doesn't exists`,
+                },
+                HttpStatus.CONFLICT
+            )
+        }
+        
+        const { error } = await this.supabaseClient.auth.resetPasswordForEmail(resetPasswordDto.email, {
+            redirectTo: `${process.env.BASE_REDIRECT_URL}/update-password`,
+        })
+
+        if (error) {
+            this.logger.error(error)
+            throw new HttpException(
+                {
+                    status: error.status,
+                    message: error.message,
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: error,
+                }
+            )
+        }
+
+        this.logger.log(`Password reset email sent to ${resetPasswordDto.email}`)
+        return { status: 201, message: "succeeded" }
+    }
+
+    async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+        const { data, error: sessionError } = await this.supabaseClient.auth.setSession({ access_token: updatePasswordDto.access_token, refresh_token: updatePasswordDto.refresh_token })
+        
+        if(sessionError) {
+            this.logger.error(`sessionError: ${sessionError}`)
+            throw new HttpException(
+                {
+                    status: HttpStatus.BAD_REQUEST,
+                    message: "something went wrong",
+                },
+                HttpStatus.BAD_REQUEST,
+                {
+                    cause: sessionError,
+                }
+            )
+        }
+
+        this.logger.log(data)
+
+        const { error } = await this.supabaseClient.auth.updateUser({
+            password: updatePasswordDto.password,
+        })
+
+        if (error) {
+            this.logger.error(error)
+            switch (error.code) {
+                case "same_password":
+                    throw new HttpException(
+                        {
+                            status: HttpStatus.CONFLICT,
+                            message: "new password should be different from the old password",
+                        },
+                        HttpStatus.CONFLICT,
+                        {
+                            cause: error,
+                        }
+                    )
+                default:
+                    throw new HttpException(
+                        {
+                            status: HttpStatus.BAD_REQUEST,
+                            message: "something went wrong",
+                        },
+                        HttpStatus.BAD_REQUEST,
+                        {
+                            cause: error,
+                        }
+                    )
+            }
+        }
+
+        this.logger.log(`Password updated successfully`)
+        return { status: 201, message: "your password is succesfully changed!" }
+    }
+
+    async confirm(confirmDto: ConfirmDto) {
+        if(!confirmDto.token) {
+            this.logger.error("token is required")
+            throw new HttpException(
+                {
+                    status: HttpStatus.BAD_REQUEST,
+                    message: "token is required",
+                },
+                HttpStatus.BAD_REQUEST
+            )
+        }
+
+        return { token: confirmDto.token, redirect_url: confirmDto.redirect_url }
+    }
 }

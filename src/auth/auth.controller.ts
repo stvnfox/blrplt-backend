@@ -1,8 +1,13 @@
-import { Controller, Post, Body, Logger } from "@nestjs/common"
-import { AuthService } from "./auth.service"
-import { CreateAuthDto } from "./dto/create-auth.dto"
-// import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Controller, Post, Body, Logger, Get, Req, UseGuards, Query, Redirect } from "@nestjs/common"
 import { ApiBody, ApiTags } from "@nestjs/swagger"
+import { Request } from "express"
+
+import { CreateAuthDto } from "./dto/create-auth.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
+
+import { AuthService } from "./auth.service"
+import { JwtAuthGuard } from "./guards/jwt.guard"
+import { UpdatePasswordDto } from "./dto/update-password.dto"
 
 @Controller("auth")
 @ApiTags("auth")
@@ -21,23 +26,65 @@ export class AuthController {
         }
     }
 
-    // @Get()
-    // findAll() {
-    //   return this.authService.findAll();
-    // }
+    // auth/login
+    @Post("login")
+    @ApiBody({ type: CreateAuthDto, description: "Login a user" })
+    async login(@Body() data: CreateAuthDto) {
+        try {
+            return this.authService.login(data)
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
 
-    // @Get(':id')
-    // findOne(@Param('id') id: string) {
-    //   return this.authService.findOne(+id);
-    // }
+    // auth/logout
+    @Post("logout")
+    async logout() {
+        try {
+            return this.authService.logout()
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
 
-    // @Patch(':id')
-    // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    //   return this.authService.update(+id, updateAuthDto);
-    // }
+    // auth/reset-password
+    @Post("reset-password")
+    async resetPassword(@Body() data: ResetPasswordDto) {
+        try {
+            return this.authService.resetPassword(data)
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
 
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //   return this.authService.remove(+id);
-    // }
+    // auth/update-password
+    @Post("update-password")
+    @UseGuards(JwtAuthGuard)
+    async updatePassword(@Body() data: UpdatePasswordDto) {
+        try {
+            return this.authService.updatePassword(data)
+        } catch (error) {
+            this.logger.error(error)
+        }
+    }
+
+    // auth/status
+    @Get("status")
+    @UseGuards(JwtAuthGuard)
+    async status(@Req() req: Request) {
+        return req.user
+    }
+
+    // auth/confirm
+    @Get("confirm")
+    @Redirect()
+    async confirm(@Query("token") token: string, @Query("redirect_url") redirect_url: string) {
+        const result = await this.authService.confirm({ token, redirect_url })
+
+        if (!result.token) {
+            this.logger.error("no token found")
+        }
+
+        return { url: redirect_url + `?code=${result.token}` }
+    }
 }
