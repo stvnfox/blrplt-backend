@@ -5,6 +5,7 @@ const allowedOrigins = [
     "https://blrplt-builder-staging.vercel.app",
     "https://blrplt-backend.vercel.app",
     "https://blrplt-backend-staging.vercel.app",
+    "https://builder.blrplt.dev"
 ]
 
 export const corsOptions = {
