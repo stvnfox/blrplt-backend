@@ -30,8 +30,8 @@ importers:
         specifier: ^2.45.4
         version: 2.45.4
       '@vercel/node':
-        specifier: ^3.2.14
-        version: 3.2.14
+        specifier: ^3.2.15
+        version: 3.2.15
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -1056,8 +1056,8 @@ packages:
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
-  '@vercel/build-utils@8.4.2':
-    resolution: {integrity: sha512-Bern3FVvUgMu8YGuP+cYSTDaUA5Kn6HsMU75osWK6npS5Sw4K9zaY+cxONDMrzo/08Kvz5vgSRnwmq+P1MYq2g==}
+  '@vercel/build-utils@8.4.3':
+    resolution: {integrity: sha512-FbHWfoXu59asJfawyNowlU+VDNHOqkrLbwbvt5hN//gQZX3A0AZtDha2uMoprF8fph7S2SswweNz/soDN/lJ1A==}
 
   '@vercel/error-utils@2.0.2':
     resolution: {integrity: sha512-Sj0LFafGpYr6pfCqrQ82X6ukRl5qpmVrHM/191kNYFqkkB9YkjlMAj6QcEsvCG259x4QZ7Tya++0AB85NDPbKQ==}
@@ -1067,8 +1067,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  '@vercel/node@3.2.14':
-    resolution: {integrity: sha512-aZFJgqem1YI3E7gvuVG/Jy4k8j19BjEQkexmnFv0nEieKuzHgTC8AzcgZQu8laEDVkpnOe+zlpmXZZBxTsvLuA==}
+  '@vercel/node@3.2.15':
+    resolution: {integrity: sha512-lk8gbyVcz4DPDekAbnarToh3v7fm+EGnj9fDP3/c47eNG8ShN2VsG9Il4cALJMDvCmjB+qQ4+sWLElofZM0Kow==}
 
   '@vercel/static-config@3.0.0':
     resolution: {integrity: sha512-2qtvcBJ1bGY0dYGYh3iM7yGKkk971FujLEDXzuW5wcZsPr1GSEjO/w2iSr3qve6nDDtBImsGoDEnus5FI4+fIw==}
@@ -1663,8 +1663,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.26:
-    resolution: {integrity: sha512-Z+OMe9M/V6Ep9n/52+b7lkvYEps26z4Yz3vjWL1V61W0q+VLF1pOHhMY17sa4roz4AWmULSI8E6SAojZA5L0YQ==}
+  electron-to-chromium@1.5.27:
+    resolution: {integrity: sha512-o37j1vZqCoEgBuWWXLHQgTN/KDKe7zwpiY5CPeq2RvUqOyJw9xnrULzZAEVQ5p4h+zjMk7hgtOoPdnLxr7m/jw==}
 
   emittery@0.13.1:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
@@ -4694,7 +4694,7 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/build-utils@8.4.2': {}
+  '@vercel/build-utils@8.4.3': {}
 
   '@vercel/error-utils@2.0.2': {}
 
@@ -4716,13 +4716,13 @@ snapshots:
       - encoding
       - supports-color
 
-  '@vercel/node@3.2.14':
+  '@vercel/node@3.2.15':
     dependencies:
       '@edge-runtime/node-utils': 2.3.0
       '@edge-runtime/primitives': 4.1.0
       '@edge-runtime/vm': 3.2.0
       '@types/node': 16.18.11
-      '@vercel/build-utils': 8.4.2
+      '@vercel/build-utils': 8.4.3
       '@vercel/error-utils': 2.0.2
       '@vercel/nft': 0.27.3
       '@vercel/static-config': 3.0.0
@@ -5060,7 +5060,7 @@ snapshots:
   browserslist@4.23.3:
     dependencies:
       caniuse-lite: 1.0.30001662
-      electron-to-chromium: 1.5.26
+      electron-to-chromium: 1.5.27
       node-releases: 2.0.18
       update-browserslist-db: 1.1.0(browserslist@4.23.3)
 
@@ -5361,7 +5361,7 @@ snapshots:
     dependencies:
       jake: 10.9.2
 
-  electron-to-chromium@1.5.26: {}
+  electron-to-chromium@1.5.27: {}
 
   emittery@0.13.1: {}
 

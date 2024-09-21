@@ -29,7 +29,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.3",
     "@supabase/supabase-js": "^2.45.4",
-    "@vercel/node": "^3.2.14",
+    "@vercel/node": "^3.2.15",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "passport": "^0.7.0",
