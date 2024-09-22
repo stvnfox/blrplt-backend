@@ -41,7 +41,7 @@ export class PageService {
       },
     });
 
-    this.logger.log('response: ' + response);
+    this.logger.log('response: ' + Response.json(response));
 
     return Response.json(response)
   }
