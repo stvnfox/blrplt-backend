@@ -21,6 +21,7 @@ export class PageService {
     });
 
     if (!site) {
+      this.logger.error(`Site not found: ${updatePageDto.siteId}`);
       throw new Error('Site not found');
     }
 
@@ -41,7 +42,12 @@ export class PageService {
       },
     });
 
-    this.logger.log('response: ' + Response.json(response));
+    if(!response) {
+      this.logger.error(`Failed to update page: ${updatePageDto.pageId} for site: ${updatePageDto.siteId}`);
+      throw new Error('Failed to update page');
+    }
+
+    this.logger.log(`page: ${updatePageDto.pageId} updated for site: ${updatePageDto.siteId}`);
 
     return Response.json(response)
   }
